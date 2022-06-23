@@ -11,6 +11,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server implements Runnable {
+    //// COMMANDS ////
+    final String CREATE = "create";
+    final String LOGIN_CHECK = "login";
+    final String SUCCESS = "SUCCESS";
+    final String FAIL = "FAIL";
+
     ServerSocket ss;
     private Thread t;
     Socket s;
@@ -64,7 +70,6 @@ public class Server implements Runnable {
 
         public Connection(Socket s) {
             socket = s;
-            System.out.println("Constructor");
         }
 
         public void sendMessage(String message) {
@@ -83,16 +88,12 @@ public class Server implements Runnable {
         @Override
         public void run() {
             try {
-                System.out.println("This runs");
                 String message;
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream(), true);
 
-                message = in.readLine();
-                System.out.println(message);
-
-                while ((message = in.readLine()) != null) { // SUS CODE
-                    System.out.println(message);
+                while ((message = in.readLine()) != null) {
+                    decode(message);
                 }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
@@ -100,11 +101,18 @@ public class Server implements Runnable {
             }
         }
 
-        public void start() {
-            System.out.println("Starting Listening messages");
-            if (t == null) {
-                t = new Thread(this, "Messages");
-                t.start();
+        public void decode(String command) {
+            String[] result = command.split(" ");
+
+            if (result[0].equals(CREATE)) {
+                if (database.createUser(result[1], result[2], result[3])) {
+                    out.println(SUCCESS);
+                    System.out.println("New Account Created");
+                } else {
+                    out.println(FAIL);
+                }
+            } else if (result[0].equals(LOGIN_CHECK)) {
+
             }
         }
     }

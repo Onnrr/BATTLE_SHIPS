@@ -1,4 +1,9 @@
 # BATTLE_SHIPS
 
+## Input formats
+* Create Account -> "create [userName] [password] [mail]"
+* Login Check -> "login [userName] [password]"
 
-* New joiners send message "connected". Dummy log in order to prevent null.
+## Output formats
+* Failed login or signup -> "FAIL"
+* Successful login or signup -> "SUCCES"
