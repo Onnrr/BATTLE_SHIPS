@@ -78,10 +78,13 @@ public class Server {
         @Override
         public void run() {
             try {
-                String message = in.readLine();
-                while ((message = in.readLine()) != null) {
-                    execute(message);
-                }
+                System.out.println("This runs");
+                String message;
+                message = in.readLine();
+                // while ((message = in.readLine()) != null) { // SUS CODE
+                System.out.println(message);
+                // execute(message);
+                // }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
