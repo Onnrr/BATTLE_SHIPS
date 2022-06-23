@@ -7,26 +7,46 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class Server {
-    private Thread t;
+public class Server implements Runnable {
     ServerSocket ss;
+    private Thread t;
     Socket s;
     DatabaseConnection database;
+    ExecutorService pool;
     ArrayList<Connection> connectedUsers;
 
     public Server() {
         database = new DatabaseConnection();
         connectedUsers = new ArrayList<Connection>();
+    }
+
+    public void start() {
+        System.out.println("Starting Server");
+        if (t == null) {
+            t = new Thread(this, "Server");
+            t.start();
+        }
+    }
+
+    @Override
+    public void run() {
         try {
             ss = new ServerSocket(9999);
+            pool = Executors.newCachedThreadPool();
+            while (true) {
+                s = ss.accept();
+                Connection newConnection = new Connection(s);
+                connectedUsers.add(newConnection);
+                pool.execute(newConnection);
+                System.out.println(connectedUsers.size());
+                System.out.println("New Connection");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        AcceptConnections accept = new AcceptConnections();
-        accept.start();
-
     }
 
     public void broadcast(String message) {
@@ -37,15 +57,6 @@ public class Server {
         }
     }
 
-    public void privateSend(int id, String message) {
-        // TODO
-        // connectedUsers.get(index).sendMessage(message);
-    }
-
-    private void execute(String message) {
-        // TODO execute commands
-    }
-
     class Connection implements Runnable {
         BufferedReader in;
         PrintWriter out;
@@ -53,13 +64,7 @@ public class Server {
 
         public Connection(Socket s) {
             socket = s;
-            try {
-                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                out = new PrintWriter(socket.getOutputStream(), true);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            System.out.println("Constructor");
         }
 
         public void sendMessage(String message) {
@@ -80,11 +85,15 @@ public class Server {
             try {
                 System.out.println("This runs");
                 String message;
+                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                out = new PrintWriter(socket.getOutputStream(), true);
+
                 message = in.readLine();
-                // while ((message = in.readLine()) != null) { // SUS CODE
                 System.out.println(message);
-                // execute(message);
-                // }
+
+                while ((message = in.readLine()) != null) { // SUS CODE
+                    System.out.println(message);
+                }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -98,36 +107,6 @@ public class Server {
                 t.start();
             }
         }
-    }
-
-    public class AcceptConnections implements Runnable {
-        private Thread t;
-        Socket s;
-
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    s = ss.accept();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Connection newConnection = new Connection(s);
-                newConnection.start();
-                connectedUsers.add(newConnection);
-                System.out.println("New Connection");
-            }
-
-        }
-
-        public void start() {
-            System.out.println("Starting Accept Connections");
-            if (t == null) {
-                t = new Thread(this, "Accept");
-                t.start();
-            }
-        }
-
     }
 
 }
