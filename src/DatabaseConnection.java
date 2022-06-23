@@ -1,4 +1,4 @@
-package models;
+package src;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -38,8 +38,4 @@ public class DatabaseConnection {
         }
     }
 
-    private static int generateID() {
-        // TODO
-        return 1;
-    }
 }
