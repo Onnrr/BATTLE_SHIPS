@@ -126,7 +126,6 @@ public class Server implements Runnable {
                 }
             } else if (result[0].equals(LOGIN_CHECK)) {
                 if (database.checkUser(result[1], result[2])) {
-                    out.println(SUCCESS);
                     System.out.println("Successful Login");
                     ResultSet set = database.getUserInfo(result[1]);
                     String userInfo = "";
@@ -142,6 +141,7 @@ public class Server implements Runnable {
 
                         userInfo += INFO + " " + id + " " + userName + " " + score + " " + mail;
                         out.println(userInfo);
+                        broadcast("JOINED" + userName);
 
                     } catch (SQLException e) {
                         e.printStackTrace();

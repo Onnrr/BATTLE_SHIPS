@@ -29,7 +29,16 @@ public class DatabaseConnection {
     }
 
     public boolean createUser(String userName, String password, String mail) {
+        ResultSet set;
         try {
+            set = statement.executeQuery("SELECT userName FROM users where userName = '" + userName + "';");
+            if (set.next()) {
+                return false;
+            }
+            set = statement.executeQuery("SELECT userMail FROM users where userMail = '" + mail + "';");
+            if (set.next()) {
+                return false;
+            }
             statement.executeUpdate(
                     "INSERT INTO users VALUES ( 0, '" + userName + "', '" + password + "', 0, NULL,'" + mail + "');");
             return true;
