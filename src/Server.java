@@ -18,6 +18,7 @@ public class Server implements Runnable {
     final String LOGIN_CHECK = "login";
     final String SUCCESS = "SUCCESS";
     final String FAIL = "FAIL";
+    final String INFO = "INFO";
 
     ServerSocket ss;
     private Thread t;
@@ -139,7 +140,7 @@ public class Server implements Runnable {
 
                         setUserID(id);
 
-                        userInfo += "INFO " + id + " " + userName + " " + score + " " + mail;
+                        userInfo += INFO + " " + id + " " + userName + " " + score + " " + mail;
                         out.println(userInfo);
 
                     } catch (SQLException e) {
