@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import com.mysql.cj.xdevapi.Result;
+
 public class DatabaseConnection {
     Connection connection;
     Statement statement;
@@ -36,6 +38,33 @@ public class DatabaseConnection {
             System.out.println("Database failed adding account");
             return false;
         }
+    }
+
+    public boolean checkUser(String userName, String password) {
+        ResultSet set;
+        try {
+            set = statement.executeQuery("SELECT userPassword FROM users where userName = '" + userName + "';");
+            if (!set.next()) {
+                return false;
+            }
+            if (password.equals(set.getString("userPassword"))) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public ResultSet getUserInfo(String userName) {
+        ResultSet set;
+        try {
+            set = statement.executeQuery("SELECT * FROM users where userName = '" + userName + "';");
+            return set;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

@@ -7,3 +7,4 @@
 ## Output formats
 * Failed login or signup -> "FAIL"
 * Successful login or signup -> "SUCCES"
+* User information -> "INFO [userID] [userName] [userScore] [mail]"
