@@ -129,20 +129,18 @@ public class Server implements Runnable {
                     System.out.println("Successful Login");
                     ResultSet set = database.getUserInfo(result[1]);
                     String userInfo = "";
-                    int index = 1;
 
                     try {
                         set.next();
                         int id = set.getInt("userID");
                         String userName = set.getString("userName");
-                        String password = set.getString("userPassword");
                         int score = set.getInt("userScore");
                         String mail = set.getString("userMail");
 
                         setUserID(id);
 
-                        userInfo += id + " " + userName + " " + password + " " + score + " " + mail;
-                        System.out.println(userInfo);
+                        userInfo += "INFO " + id + " " + userName + " " + score + " " + mail;
+                        out.println(userInfo);
 
                     } catch (SQLException e) {
                         e.printStackTrace();
