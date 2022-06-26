@@ -70,15 +70,39 @@ public class Server implements Runnable {
         BufferedReader in;
         PrintWriter out;
         Socket socket;
+        String name;
         int userID;
+        int status;
+        /*
+         * 0 online
+         * 1 in game
+         */
 
         public Connection(Socket s) {
             socket = s;
             userID = -1;
+            name = "";
+            status = 0;
         }
 
         public void setUserID(int id) {
             userID = id;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getStatus() {
+            return status;
+        }
+
+        public void setStatus(int status) {
+            this.status = status;
         }
 
         public int getUserID() {
@@ -138,6 +162,7 @@ public class Server implements Runnable {
                         String mail = set.getString("userMail");
 
                         setUserID(id);
+                        setName(userName);
 
                         userInfo += INFO + " " + id + " " + userName + " " + score + " " + mail;
                         out.println(userInfo);
@@ -146,9 +171,6 @@ public class Server implements Runnable {
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-
-                    // TODO set connection id
-                    // TODO broadcast that new player joined
                 } else {
                     out.println(FAIL);
                     System.out.println("Login failed");
