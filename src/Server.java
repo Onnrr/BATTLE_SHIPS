@@ -16,9 +16,12 @@ public class Server implements Runnable {
     //// COMMANDS ////
     final String CREATE = "create";
     final String LOGIN_CHECK = "login";
+    final String DISCONNECT = "disconnect";
     final String SUCCESS = "SUCCESS";
     final String FAIL = "FAIL";
     final String INFO = "INFO";
+    final String CONNECTED = "CONNECTED";
+    final String DISCONNECTED = "DISCONNECTED";
 
     ServerSocket ss;
     private Thread t;
@@ -145,6 +148,8 @@ public class Server implements Runnable {
                 if (database.createUser(result[1], result[2], result[3])) {
                     out.println(SUCCESS);
                     System.out.println("New Account Created");
+                    // TODO clear fields account created warning
+                    connectedUsers.remove(this);
                 } else {
                     out.println(FAIL);
                 }
@@ -166,15 +171,32 @@ public class Server implements Runnable {
 
                         userInfo += INFO + " " + id + " " + userName + " " + score + " " + mail;
                         out.println(userInfo);
-                        broadcast("JOINED" + userName);
+                        String onlinePlayers = "ONLINE_PLAYERS ";
+                        for (int i = 0; i < connectedUsers.size(); i++) {
+                            if (connectedUsers.get(i).getUserID() != id) {
+                                connectedUsers.get(i).sendMessage(CONNECTED + " " + userName);
+
+                                onlinePlayers += connectedUsers.get(i).getName() + " "
+                                        + connectedUsers.get(i).getStatus() + " ";
+                            }
+                        }
+                        out.println(onlinePlayers);
 
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
                 } else {
                     out.println(FAIL);
+                    connectedUsers.remove(this);
                     System.out.println("Login failed");
                 }
+            } else if (result[0].equals(DISCONNECT)) {
+                connectedUsers.remove(this);
+                for (Connection c : connectedUsers) {
+                    c.sendMessage(DISCONNECTED + " " + getName());
+                }
+            } else {
+                System.out.println(command);
             }
         }
     }
