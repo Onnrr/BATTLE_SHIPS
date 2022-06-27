@@ -17,11 +17,15 @@ public class Server implements Runnable {
     final String CREATE = "create";
     final String LOGIN_CHECK = "login";
     final String DISCONNECT = "disconnect";
+    final String INVITE = "invite";
+    final String DECLINE_GAME = "decline_game";
     final String SUCCESS = "SUCCESS";
     final String FAIL = "FAIL";
     final String INFO = "INFO";
     final String CONNECTED = "CONNECTED";
     final String DISCONNECTED = "DISCONNECTED";
+    final String INVITATION = "INVITATION";
+    final String DECLINED = "DECLINED";
 
     ServerSocket ss;
     private Thread t;
@@ -174,9 +178,10 @@ public class Server implements Runnable {
                         String onlinePlayers = "ONLINE_PLAYERS ";
                         for (int i = 0; i < connectedUsers.size(); i++) {
                             if (connectedUsers.get(i).getUserID() != id) {
-                                connectedUsers.get(i).sendMessage(CONNECTED + " " + userName);
+                                connectedUsers.get(i).sendMessage(CONNECTED + " " + userID + " " + userName);
 
-                                onlinePlayers += connectedUsers.get(i).getName() + " "
+                                onlinePlayers += connectedUsers.get(i).getUserID() + " "
+                                        + connectedUsers.get(i).getName() + " "
                                         + connectedUsers.get(i).getStatus() + " ";
                             }
                         }
@@ -194,6 +199,20 @@ public class Server implements Runnable {
                 connectedUsers.remove(this);
                 for (Connection c : connectedUsers) {
                     c.sendMessage(DISCONNECTED + " " + getName());
+                }
+            } else if (result[0].equals(INVITE)) {
+                int inviteID = Integer.parseInt(result[1]);
+                for (Connection c : connectedUsers) {
+                    if (c.getUserID() == inviteID) {
+                        c.sendMessage(INVITATION + " " + getUserID() + " " + getName());
+                    }
+                }
+            } else if (result[0].equals(DECLINE_GAME)) {
+                int inviteID = Integer.parseInt(result[2]);
+                for (Connection c : connectedUsers) {
+                    if (c.getUserID() == inviteID) {
+                        c.sendMessage(DECLINED + " " + result[1]);
+                    }
                 }
             } else {
                 System.out.println(command);
