@@ -76,4 +76,14 @@ public class DatabaseConnection {
         return null;
     }
 
+    public boolean deleteAccount(int id) {
+        try {
+            statement.executeUpdate("DELETE FROM users WHERE userID = " + id + ";");
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

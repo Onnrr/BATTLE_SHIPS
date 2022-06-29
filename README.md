@@ -6,6 +6,7 @@
 * Invite other player -> "invite [otherPlayersID]"
 * Decline game invite -> "decline_game [userID] [invitorID]"
 * Disconnect -> "disconnect"
+* Delete -> "delete"
 
 ## Output formats
 * Failed login or signup -> "FAIL"
@@ -16,3 +17,4 @@
 * List of online players -> "ONLINE_PLAYERS [id] [userName] [status] ..... [id] [userName] [status]"
 * Invitation -> "INVITATION [userID] [userName]"
 * Declined game invite -> "DECLINED [userID]"
+
