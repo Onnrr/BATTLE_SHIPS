@@ -19,6 +19,7 @@ public class Server implements Runnable {
     final String DISCONNECT = "disconnect";
     final String INVITE = "invite";
     final String DECLINE_GAME = "decline_game";
+    final String ACCEPT_GAME = "accept_game";
     final String DELETE_ACCOUNT = "delete";
     final String SUCCESS = "SUCCESS";
     final String FAIL = "FAIL";
@@ -27,7 +28,10 @@ public class Server implements Runnable {
     final String DISCONNECTED = "DISCONNECTED";
     final String INVITATION = "INVITATION";
     final String DECLINED = "DECLINED";
+    final String ACCEPTED = "ACCEPTED";
     final String RANK = "RANK";
+    final String GAME_START = "GAME_START";
+    final String GAME_FAIL = "GAME_FAIL";
 
     ServerSocket ss;
     private Thread t;
@@ -226,6 +230,15 @@ public class Server implements Runnable {
                         c.sendMessage(DECLINED + " " + result[1]);
                     }
                 }
+            } else if (result[0].equals(ACCEPT_GAME)) {
+                for (Connection c : connectedUsers) {
+                    if (c.getUserID() == Integer.parseInt(result[2]) && c.getStatus() == 0) {
+                        out.println(GAME_START + " " + result[2]);
+                        c.sendMessage(GAME_START + " " + getUserID());
+                        return;
+                    }
+                }
+                out.println(GAME_FAIL + " " + result[2]);
             } else if (result[0].equals(DELETE_ACCOUNT)) {
                 if (database.deleteAccount(getUserID())) {
                     connectedUsers.remove(this);
