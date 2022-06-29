@@ -214,7 +214,7 @@ public class Server implements Runnable {
             } else if (result[0].equals(DISCONNECT)) {
                 connectedUsers.remove(this);
                 for (Connection c : connectedUsers) {
-                    c.sendMessage(DISCONNECTED + " " + getName());
+                    c.sendMessage(DISCONNECTED + " " + getUserID() + " " + getName());
                 }
             } else if (result[0].equals(INVITE)) {
                 int inviteID = Integer.parseInt(result[1]);
@@ -233,8 +233,8 @@ public class Server implements Runnable {
             } else if (result[0].equals(ACCEPT_GAME)) {
                 for (Connection c : connectedUsers) {
                     if (c.getUserID() == Integer.parseInt(result[2]) && c.getStatus() == 0) {
-                        out.println(GAME_START + " " + result[2]);
-                        c.sendMessage(GAME_START + " " + getUserID());
+                        out.println(GAME_START + " " + c.getUserID() + " " + c.getName());
+                        c.sendMessage(GAME_START + " " + getUserID() + " " + getName());
                         return;
                     }
                 }
