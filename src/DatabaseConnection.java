@@ -86,4 +86,15 @@ public class DatabaseConnection {
         }
     }
 
+    public ResultSet getRank() {
+        ResultSet set;
+        try {
+            set = statement.executeQuery("SELECT * FROM users ORDER BY userScore DESC LIMIT 5;");
+            return set;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

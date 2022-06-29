@@ -27,6 +27,7 @@ public class Server implements Runnable {
     final String DISCONNECTED = "DISCONNECTED";
     final String INVITATION = "INVITATION";
     final String DECLINED = "DECLINED";
+    final String RANK = "RANK";
 
     ServerSocket ss;
     private Thread t;
@@ -188,6 +189,16 @@ public class Server implements Runnable {
                         }
                         out.println(onlinePlayers);
 
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    set = database.getRank();
+                    String rank = RANK + " ";
+                    try {
+                        while (set.next()) {
+                            rank += set.getString("userName") + " " + set.getInt("userScore") + " ";
+                        }
+                        out.println(rank);
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }

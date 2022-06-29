@@ -15,6 +15,7 @@
 * New player connected -> "CONNECTED [userID] [userName]"
 * Player disconnected -> "DISCONNECTED [userName]"
 * List of online players -> "ONLINE_PLAYERS [id] [userName] [status] ..... [id] [userName] [status]"
+* Top 5 players -> "RANK [userName] [score] ... [userName] [score]"
 * Invitation -> "INVITATION [userID] [userName]"
 * Declined game invite -> "DECLINED [userID]"
 
