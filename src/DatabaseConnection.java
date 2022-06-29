@@ -97,4 +97,12 @@ public class DatabaseConnection {
         }
     }
 
+    public void setScore(int id, int score) {
+        try {
+            statement.executeUpdate("UPDATE users SET userScore = " + score + " WHERE userID = " + id + ";");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
