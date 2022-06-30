@@ -240,6 +240,16 @@ public class Server implements Runnable {
                         c.setStatus(0);
                         c.setOpponentID(-1);
                         c.sendMessage(OPPONENT_DISCONNECTED);
+                        String onlinePlayers = "ONLINE_PLAYERS";
+                        for (Connection con : connectedUsers) {
+                            if (c.getUserID() == con.getUserID()) {
+                                continue;
+                            }
+                            onlinePlayers += " " + con.getUserID() + " "
+                                    + con.getName() + " "
+                                    + con.getStatus();
+                        }
+                        c.sendMessage(onlinePlayers);
                     }
                     c.sendMessage(DISCONNECTED + " " + getUserID() + " " + getName());
                 }
