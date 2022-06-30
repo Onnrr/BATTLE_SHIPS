@@ -9,7 +9,7 @@
 * Send message -> "message [yourMessage]"
 * Disconnect -> "disconnect"
 * Delete Account -> "delete"
-* Leave game -> "leave"
+* Leave game -> "leave [opponentID]"
 
 ## Output formats
 * Failed login or signup -> "FAIL"
