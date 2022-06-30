@@ -21,6 +21,7 @@ public class Server implements Runnable {
     final String DECLINE_GAME = "decline_game";
     final String ACCEPT_GAME = "accept_game";
     final String DELETE_ACCOUNT = "delete";
+    final String NEW_MESSAGE = "message";
     final String SUCCESS = "SUCCESS";
     final String FAIL = "FAIL";
     final String INFO = "INFO";
@@ -32,6 +33,7 @@ public class Server implements Runnable {
     final String RANK = "RANK";
     final String GAME_START = "GAME_START";
     final String GAME_FAIL = "GAME_FAIL";
+    final String SEND_MESSAGE = "MESSAGE";
 
     ServerSocket ss;
     private Thread t;
@@ -86,6 +88,7 @@ public class Server implements Runnable {
         String name;
         int userID;
         int status;
+        boolean stop;
         /*
          * 0 online
          * 1 in game
@@ -96,6 +99,7 @@ public class Server implements Runnable {
             userID = -1;
             name = "";
             status = 0;
+            stop = false;
         }
 
         public void setUserID(int id) {
@@ -142,13 +146,18 @@ public class Server implements Runnable {
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream(), true);
 
-                while ((message = in.readLine()) != null) {
+                while (!stop) {
+                    message = in.readLine();
                     decode(message);
                 }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+        }
+
+        public void stop() {
+            stop = true;
         }
 
         public void decode(String command) {
@@ -216,6 +225,7 @@ public class Server implements Runnable {
                 for (Connection c : connectedUsers) {
                     c.sendMessage(DISCONNECTED + " " + getUserID() + " " + getName());
                 }
+                stop();
             } else if (result[0].equals(INVITE)) {
                 int inviteID = Integer.parseInt(result[1]);
                 for (Connection c : connectedUsers) {
@@ -245,6 +255,13 @@ public class Server implements Runnable {
                     System.out.println("Deleted");
                     for (Connection c : connectedUsers) {
                         c.sendMessage(DISCONNECTED + " " + getName());
+                    }
+                }
+            } else if (result[0].equals(NEW_MESSAGE)) {
+                String message = command.substring(8);
+                for (Connection c : connectedUsers) {
+                    if (getUserID() != c.getUserID()) {
+                        c.sendMessage(SEND_MESSAGE + " " + getUserID() + " " + getName() + " " + message);
                     }
                 }
             } else {

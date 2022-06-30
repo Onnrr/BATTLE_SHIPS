@@ -6,8 +6,10 @@
 * Invite other player -> "invite [otherPlayersID]"
 * Decline game invite -> "decline_game [userID] [invitorID]"
 * Accept game invite -> "accept_game [userID] [invitorID]"
+* Send message -> "message [yourMessage]"
 * Disconnect -> "disconnect"
-* Delete -> "delete"
+* Delete Account -> "delete"
+* Leave game -> "leave"
 
 ## Output formats
 * Failed login or signup -> "FAIL"
@@ -22,5 +24,9 @@
 * Game is starting -> "GAME_START [opponentID]"
 * Declined game invite -> "DECLINED [userID]"
 * Accepted game invite -> "ACCEPTED [userID]"
+* New Message -> "MESSAGE [senderID] [senderName] [message]"
+
+* Opponent disconnected -> "OPPONENT_DISCONNECTED"
+* Opponent ready -> "OPPONENT_READY"
 
 TODO send all players player joined game
