@@ -23,6 +23,7 @@ public class Server implements Runnable {
     final String DELETE_ACCOUNT = "delete";
     final String NEW_MESSAGE = "message";
     final String LEAVE = "leave";
+    final String CAN_LEAVE = "LEAVE";
     final String SUCCESS = "SUCCESS";
     final String FAIL = "FAIL";
     final String INFO = "INFO";
@@ -297,15 +298,35 @@ public class Server implements Runnable {
                     }
                 }
             } else if (result[0].equals(LEAVE)) {
-                setStatus(0);
-                setOpponentID(-1);
+                String onlinePlayers = "ONLINE_PLAYERS";
+                out.println(CAN_LEAVE);
+                for (Connection con : connectedUsers) {
+                    if (getUserID() == con.getUserID()) {
+                        continue;
+                    }
+                    onlinePlayers += " " + con.getUserID() + " " + con.getName() + " " + con.getStatus();
+                }
+                out.println(onlinePlayers);
+                System.out.println("Sent message to " + getName());
                 for (Connection c : connectedUsers) {
-                    if (Integer.parseInt(result[1]) == c.getUserID()) {
-                        c.sendMessage(OPPONENT_DISCONNECTED);
+                    if (getOpponentID() == c.getUserID()) {
                         c.setStatus(0);
                         c.setOpponentID(-1);
+                        c.sendMessage(OPPONENT_DISCONNECTED);
+                        String online = "ONLINE_PLAYERS";
+                        for (Connection con : connectedUsers) {
+                            if (c.getUserID() == con.getUserID()) {
+                                continue;
+                            }
+                            online += " " + con.getUserID() + " "
+                                    + con.getName() + " "
+                                    + con.getStatus();
+                        }
+                        c.sendMessage(online);
                     }
                 }
+                setOpponentID(-1);
+                setStatus(0);
             } else {
                 System.out.println(command);
             }

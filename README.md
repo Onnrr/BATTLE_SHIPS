@@ -9,7 +9,7 @@
 * Send message -> "message [yourMessage]"
 * Disconnect -> "disconnect"
 * Delete Account -> "delete"
-* Leave game -> "leave [opponentID]"
+* Leave game -> "leave"
 
 ## Output formats
 * Failed login or signup -> "FAIL"
@@ -25,6 +25,7 @@
 * Declined game invite -> "DECLINED [userID]"
 * Accepted game invite -> "ACCEPTED [userID]"
 * New Message -> "MESSAGE [senderID] [senderName] [message]"
+* Permission to leave -> "LEAVE"
 
 * Opponent disconnected -> "OPPONENT_DISCONNECTED"
 * Opponent ready -> "OPPONENT_READY"
