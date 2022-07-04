@@ -12,6 +12,8 @@
 * Leave game -> "leave"
 * Ready for game -> "ready"
 
+* Location guess -> "guess [row][column]"
+
 ## Output formats
 * Failed login or signup -> "FAIL"
 * Successful login or signup -> "SUCCES"
@@ -30,5 +32,6 @@
 
 * Opponent disconnected -> "OPPONENT_DISCONNECTED"
 * Opponent ready -> "OPPONENT_READY"
+* Location guess -> "GUESS [row][column]"
 
 TODO send all players player joined game
