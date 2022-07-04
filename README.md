@@ -10,6 +10,7 @@
 * Disconnect -> "disconnect"
 * Delete Account -> "delete"
 * Leave game -> "leave"
+* Ready for game -> "ready"
 
 ## Output formats
 * Failed login or signup -> "FAIL"

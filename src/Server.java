@@ -23,6 +23,7 @@ public class Server implements Runnable {
     final String DELETE_ACCOUNT = "delete";
     final String NEW_MESSAGE = "message";
     final String LEAVE = "leave";
+    final String READY = "ready";
     final String CAN_LEAVE = "LEAVE";
     final String SUCCESS = "SUCCESS";
     final String FAIL = "FAIL";
@@ -36,7 +37,9 @@ public class Server implements Runnable {
     final String GAME_START = "GAME_START";
     final String GAME_FAIL = "GAME_FAIL";
     final String SEND_MESSAGE = "MESSAGE";
+    final String ONLINE_PLAYERS = "ONLINE_PLAYERS";
     final String OPPONENT_DISCONNECTED = "OPPONENT_DISCONNECTED";
+    final String OPPONENT_READY = "OPPONENT_READY";
 
     ServerSocket ss;
     private Thread t;
@@ -203,14 +206,14 @@ public class Server implements Runnable {
 
                         userInfo += INFO + " " + id + " " + userName + " " + score + " " + mail;
                         out.println(userInfo);
-                        String onlinePlayers = "ONLINE_PLAYERS ";
+                        String onlinePlayers = ONLINE_PLAYERS;
                         for (int i = 0; i < connectedUsers.size(); i++) {
                             if (connectedUsers.get(i).getUserID() != id) {
                                 connectedUsers.get(i).sendMessage(CONNECTED + " " + userID + " " + userName);
 
-                                onlinePlayers += connectedUsers.get(i).getUserID() + " "
+                                onlinePlayers += " " + connectedUsers.get(i).getUserID() + " "
                                         + connectedUsers.get(i).getName() + " "
-                                        + connectedUsers.get(i).getStatus() + " ";
+                                        + connectedUsers.get(i).getStatus();
                             }
                         }
                         out.println(onlinePlayers);
@@ -235,13 +238,12 @@ public class Server implements Runnable {
                 }
             } else if (result[0].equals(DISCONNECT)) {
                 connectedUsers.remove(this);
-                // TODO send info
                 for (Connection c : connectedUsers) {
                     if (c.getUserID() == getOpponentID()) {
                         c.setStatus(0);
                         c.setOpponentID(-1);
                         c.sendMessage(OPPONENT_DISCONNECTED);
-                        String onlinePlayers = "ONLINE_PLAYERS";
+                        String onlinePlayers = ONLINE_PLAYERS;
                         for (Connection con : connectedUsers) {
                             if (c.getUserID() == con.getUserID()) {
                                 continue;
@@ -327,6 +329,13 @@ public class Server implements Runnable {
                 }
                 setOpponentID(-1);
                 setStatus(0);
+            } else if (result[0].equals(READY)) {
+                // Sending message to opponent
+                for (Connection c : connectedUsers) {
+                    if (c.getUserID() == opponentID) {
+                        c.sendMessage(OPPONENT_READY);
+                    }
+                }
             } else {
                 System.out.println(command);
             }

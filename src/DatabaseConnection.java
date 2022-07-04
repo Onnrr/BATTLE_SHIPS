@@ -6,8 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import com.mysql.cj.xdevapi.Result;
-
 public class DatabaseConnection {
     Connection connection;
     Statement statement;
