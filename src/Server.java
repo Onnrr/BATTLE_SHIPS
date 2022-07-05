@@ -40,6 +40,14 @@ public class Server implements Runnable {
     final String ONLINE_PLAYERS = "ONLINE_PLAYERS";
     final String OPPONENT_DISCONNECTED = "OPPONENT_DISCONNECTED";
     final String OPPONENT_READY = "OPPONENT_READY";
+    final String PLAYER_GUESS = "guess";
+    final String GUESS = "GUESS";
+    final String PLAYER_HIT = "hit";
+    final String PLAYER_MISS = "miss";
+    final String HIT = "HIT";
+    final String MISS = "MISS";
+    final String TO_GAME = "to_game";
+    final String DUMMY = "";
 
     ServerSocket ss;
     private Thread t;
@@ -167,7 +175,6 @@ public class Server implements Runnable {
                     decode(message);
                 }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -178,12 +185,11 @@ public class Server implements Runnable {
 
         public void decode(String command) {
             String[] result = command.split(" ");
-
+            System.out.println(command);
             if (result[0].equals(CREATE)) {
                 if (database.createUser(result[1], result[2], result[3])) {
                     out.println(SUCCESS);
                     System.out.println("New Account Created");
-                    // TODO clear fields account created warning
                     connectedUsers.remove(this);
                 } else {
                     out.println(FAIL);
@@ -300,6 +306,7 @@ public class Server implements Runnable {
                     }
                 }
             } else if (result[0].equals(LEAVE)) {
+                setStatus(0);
                 String onlinePlayers = "ONLINE_PLAYERS";
                 out.println(CAN_LEAVE);
                 for (Connection con : connectedUsers) {
@@ -328,12 +335,37 @@ public class Server implements Runnable {
                     }
                 }
                 setOpponentID(-1);
-                setStatus(0);
+
             } else if (result[0].equals(READY)) {
                 // Sending message to opponent
                 for (Connection c : connectedUsers) {
                     if (c.getUserID() == opponentID) {
                         c.sendMessage(OPPONENT_READY);
+                    }
+                }
+            } else if (result[0].equals(PLAYER_GUESS)) {
+                for (Connection c : connectedUsers) {
+                    if (c.getUserID() == opponentID) {
+                        c.sendMessage(GUESS + " " + result[1] + " " + result[2]);
+                    }
+                }
+            } else if (result[0].equals(PLAYER_HIT)) {
+                for (Connection c : connectedUsers) {
+                    if (c.getUserID() == opponentID) {
+                        c.sendMessage(HIT);
+                    }
+                }
+            } else if (result[0].equals(PLAYER_MISS)) {
+                for (Connection c : connectedUsers) {
+                    if (c.getUserID() == opponentID) {
+                        c.sendMessage(MISS);
+                    }
+                }
+            } else if (result[0].equals(TO_GAME)) {
+                out.println(DUMMY);
+                for (Connection c : connectedUsers) {
+                    if (c.getUserID() == opponentID) {
+                        c.sendMessage(DUMMY);
                     }
                 }
             } else {

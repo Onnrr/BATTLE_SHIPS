@@ -11,8 +11,9 @@
 * Delete Account -> "delete"
 * Leave game -> "leave"
 * Ready for game -> "ready"
+* Both players ready and going to game -> "to_game"
 
-* Location guess -> "guess [row][column]"
+* Location guess -> "guess [row] [column]"
 
 ## Output formats
 * Failed login or signup -> "FAIL"
@@ -32,6 +33,9 @@
 
 * Opponent disconnected -> "OPPONENT_DISCONNECTED"
 * Opponent ready -> "OPPONENT_READY"
-* Location guess -> "GUESS [row][column]"
+* Location guess -> "GUESS [row] [column]"
+* Correct guess -> "HIT"
+* Incorrect guess -> "MISS"
+* Dummy message in order to finish the setup thread -> ""
 
 TODO send all players player joined game
