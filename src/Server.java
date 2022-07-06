@@ -13,6 +13,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server implements Runnable {
+    final int PORT = 9999;
+
     //// COMMANDS ////
     final String CREATE = "create";
     final String LOGIN_CHECK = "login";
@@ -48,6 +50,12 @@ public class Server implements Runnable {
     final String MISS = "MISS";
     final String TO_GAME = "to_game";
     final String DUMMY = "";
+    final String STARTED_GAME = "STARTED_GAME";
+    final String LEFT_GAME = "LEFT_GAME";
+
+    final String WIN = "win";
+    final String LOSE = "lose";
+    final String GAME_FINISHED = "game_finished";
 
     ServerSocket ss;
     private Thread t;
@@ -72,7 +80,7 @@ public class Server implements Runnable {
     @Override
     public void run() {
         try {
-            ss = new ServerSocket(9999);
+            ss = new ServerSocket(PORT);
             pool = Executors.newCachedThreadPool();
             while (true) {
                 s = ss.accept();
@@ -278,6 +286,8 @@ public class Server implements Runnable {
                     }
                 }
             } else if (result[0].equals(ACCEPT_GAME)) {
+                // Notify all users
+                boolean success = false;
                 for (Connection c : connectedUsers) {
                     if (c.getUserID() == Integer.parseInt(result[2]) && c.getStatus() == 0) {
                         out.println(GAME_START + " " + c.getUserID() + " " + c.getName());
@@ -286,10 +296,21 @@ public class Server implements Runnable {
                         setOpponentID(c.getUserID());
                         c.setStatus(1);
                         setStatus(1);
-                        return;
+                        success = true;
+                        break;
                     }
                 }
-                out.println(GAME_FAIL + " " + result[2]);
+                if (success) {
+                    for (Connection c : connectedUsers) {
+                        if (c.getUserID() != userID && c.getUserID() != opponentID) {
+                            c.sendMessage(STARTED_GAME + " " + getUserID());
+                            c.sendMessage(STARTED_GAME + " " + getOpponentID());
+                        }
+                    }
+                } else {
+                    out.println(GAME_FAIL + " " + result[2]);
+                }
+
             } else if (result[0].equals(DELETE_ACCOUNT)) {
                 if (database.deleteAccount(getUserID())) {
                     connectedUsers.remove(this);
@@ -332,6 +353,9 @@ public class Server implements Runnable {
                                     + con.getStatus();
                         }
                         c.sendMessage(online);
+                    } else if (c.getUserID() != getUserID() && c.getUserID() != getOpponentID()) {
+                        c.sendMessage(LEFT_GAME + " " + getUserID());
+                        c.sendMessage(LEFT_GAME + " " + getOpponentID());
                     }
                 }
                 setOpponentID(-1);
@@ -366,6 +390,41 @@ public class Server implements Runnable {
                 for (Connection c : connectedUsers) {
                     if (c.getUserID() == opponentID) {
                         c.sendMessage(DUMMY);
+                    }
+                }
+            } else if (result[0].equals(WIN)) {
+                out.println(DUMMY);
+                database.setScore(getUserID(), Integer.parseInt(result[1]));
+            } else if (result[0].equals(LOSE)) {
+                out.println(DUMMY);
+                database.setScore(getUserID(), Integer.parseInt(result[1]));
+            } else if (result[0].equals(GAME_FINISHED)) {
+                setStatus(0);
+                setOpponentID(-1);
+
+                String online = "ONLINE_PLAYERS";
+                for (Connection con : connectedUsers) {
+                    if (getUserID() == con.getUserID()) {
+                        continue;
+                    }
+                    online += " " + con.getUserID() + " "
+                            + con.getName() + " "
+                            + con.getStatus();
+                }
+                out.println(online);
+                ResultSet set = database.getRank();
+                String rank = RANK + " ";
+                try {
+                    while (set.next()) {
+                        rank += set.getString("userName") + " " + set.getInt("userScore") + " ";
+                    }
+                    out.println(rank);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                for (Connection c : connectedUsers) {
+                    if (c.getUserID() != getUserID()) {
+                        c.sendMessage(LEFT_GAME + " " + getUserID());
                     }
                 }
             } else {

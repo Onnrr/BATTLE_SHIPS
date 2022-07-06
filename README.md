@@ -13,7 +13,11 @@
 * Ready for game -> "ready"
 * Both players ready and going to game -> "to_game"
 
+
 * Location guess -> "guess [row] [column]"
+* Player wins -> "win [score]"
+* Player loses -> "lose [score]"
+* Player goes back to lobby -> "game_finished"
 
 ## Output formats
 * Failed login or signup -> "FAIL"
@@ -30,6 +34,8 @@
 * Accepted game invite -> "ACCEPTED [userID]"
 * New Message -> "MESSAGE [senderID] [senderName] [message]"
 * Permission to leave -> "LEAVE"
+* A player joined a game -> "STARTED_GAME [userID]"
+* A player left or finished a game -> "LEFT_GAME [userID]"
 
 * Opponent disconnected -> "OPPONENT_DISCONNECTED"
 * Opponent ready -> "OPPONENT_READY"
