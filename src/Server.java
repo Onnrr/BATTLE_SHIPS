@@ -9,11 +9,23 @@ import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
 public class Server implements Runnable {
     final int PORT = 9999;
+    final String HOST = "localhost";
+    final String mail = "m.onuruysal1@gmail.com";
+    final String password = "K238LMYRqozwgR";
 
     //// COMMANDS ////
     final String CREATE = "create";
@@ -52,6 +64,12 @@ public class Server implements Runnable {
     final String DUMMY = "";
     final String STARTED_GAME = "STARTED_GAME";
     final String LEFT_GAME = "LEFT_GAME";
+    final String CHANGE_PASSWORD = "change_password";
+    final String PASSWORD_CHANGED = "PASSWORD_CHANGED";
+    final String PASSWORD_CHANGE_FAIL = "PASSWORD_CHANGE_FAIL";
+    final String RESET_PASSWORD = "reset_password";
+    final String PASSWORD_RESET = "PASSWORD_RESET";
+    final String PASSWORD_RESET_FAIL = "PASSWORD_RESET_FAIL";
 
     final String WIN = "win";
     final String LOSE = "lose";
@@ -130,6 +148,41 @@ public class Server implements Runnable {
             opponentID = id;
         }
 
+        public int generatePassword() {
+            return (int) ((Math.random() * (999999 - 100000)) + 100000);
+        }
+
+        public boolean sendResetMail(String to, int newPassword) {
+            Properties props = new Properties();
+            props.put("mail.smtp.host", HOST);
+            props.put("mail.smtp.auth", "true");
+
+            Session session = Session.getDefaultInstance(props,
+                    new javax.mail.Authenticator() {
+                        protected PasswordAuthentication getPasswordAuthentication() {
+                            return new PasswordAuthentication(mail, password);
+                        }
+                    });
+            try {
+                MimeMessage message = new MimeMessage(session);
+                message.setFrom(new InternetAddress(mail));
+                message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+                message.setSubject("Battleships Password Reset");
+                message.setText(
+                        "Your password for the account with mail \"" + to + "\" has been changed to " + newPassword +
+                                ". You can change your password later in the game settings.");
+
+                // send the message
+                Transport.send(message);
+
+                System.out.println("message sent");
+                return true;
+            } catch (MessagingException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+
         public int getOpponentID() {
             return opponentID;
         }
@@ -199,8 +252,21 @@ public class Server implements Runnable {
                     out.println(SUCCESS);
                     System.out.println("New Account Created");
                     connectedUsers.remove(this);
+                    try {
+                        out.close();
+                        in.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 } else {
                     out.println(FAIL);
+                    connectedUsers.remove(this);
+                    try {
+                        out.close();
+                        in.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             } else if (result[0].equals(LOGIN_CHECK)) {
                 if (database.checkUser(result[1], result[2])) {
@@ -248,10 +314,22 @@ public class Server implements Runnable {
                 } else {
                     out.println(FAIL);
                     connectedUsers.remove(this);
+                    try {
+                        out.close();
+                        in.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     System.out.println("Login failed");
                 }
             } else if (result[0].equals(DISCONNECT)) {
                 connectedUsers.remove(this);
+                try {
+                    out.close();
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 for (Connection c : connectedUsers) {
                     if (c.getUserID() == getOpponentID()) {
                         c.setStatus(0);
@@ -313,6 +391,13 @@ public class Server implements Runnable {
 
             } else if (result[0].equals(DELETE_ACCOUNT)) {
                 if (database.deleteAccount(getUserID())) {
+                    try {
+                        out.close();
+                        in.close();
+                    } catch (IOException e) {
+
+                        e.printStackTrace();
+                    }
                     connectedUsers.remove(this);
                     System.out.println("Deleted");
                     for (Connection c : connectedUsers) {
@@ -427,6 +512,31 @@ public class Server implements Runnable {
                         c.sendMessage(LEFT_GAME + " " + getUserID());
                     }
                 }
+            } else if (result[0].equals(CHANGE_PASSWORD)) {
+                System.out.println(command);
+                if (database.changePassword(getUserID(), result[1], result[2])) {
+                    out.println(PASSWORD_CHANGED);
+                } else {
+                    out.println(PASSWORD_CHANGE_FAIL);
+                }
+            } else if (result[0].equals(RESET_PASSWORD)) {
+                int newPassword = generatePassword();
+                if (database.resetPassword(getUserID(), result[1], newPassword)) {
+                    out.println(PASSWORD_RESET);
+                    sendResetMail(result[1], newPassword);
+                    System.out.println("hersey bitti");
+
+                } else {
+                    out.println(PASSWORD_RESET_FAIL);
+                    System.out.println("failed");
+                }
+                try {
+                    out.close();
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                connectedUsers.remove(this);
             } else {
                 System.out.println(command);
             }

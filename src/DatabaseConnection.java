@@ -103,4 +103,52 @@ public class DatabaseConnection {
         }
     }
 
+    public boolean changePassword(int id, String exPassword, String newPassword) {
+        ResultSet set;
+        try {
+            set = statement.executeQuery("SELECT userPassword FROM users where userID = " + id + ";");
+            if (!set.next()) {
+                System.out.println("a");
+                return false;
+            }
+            if (!exPassword.equals(set.getString("userPassword"))) {
+                System.out.println("b");
+                return false;
+            }
+        } catch (SQLException e) {
+            System.out.println("c");
+            e.printStackTrace();
+        }
+        try {
+            statement
+                    .executeUpdate("UPDATE users SET userPassword = '" + newPassword + "' WHERE userID = " + id + ";");
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean resetPassword(int id, String mail, int newPassword) {
+        ResultSet set;
+        try {
+            set = statement.executeQuery("SELECT userMail FROM users where userID = " + id + ";");
+            if (!set.next()) {
+                System.out.println("a");
+                return false;
+            }
+        } catch (SQLException e) {
+            System.out.println("c");
+            e.printStackTrace();
+        }
+        try {
+            statement
+                    .executeUpdate("UPDATE users SET userPassword = '" + newPassword + "' WHERE userID = " + id + ";");
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }

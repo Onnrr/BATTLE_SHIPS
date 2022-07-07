@@ -12,6 +12,7 @@
 * Leave game -> "leave"
 * Ready for game -> "ready"
 * Both players ready and going to game -> "to_game"
+* Password change -> "password_change [currentPassword] [newPassword]"
 
 
 * Location guess -> "guess [row] [column]"
@@ -36,6 +37,8 @@
 * Permission to leave -> "LEAVE"
 * A player joined a game -> "STARTED_GAME [userID]"
 * A player left or finished a game -> "LEFT_GAME [userID]"
+* Password changed successfully -> "PASSWORD_CHANGED"
+* Password change failed -> "PASSWORD_CHANGE_FAIL"
 
 * Opponent disconnected -> "OPPONENT_DISCONNECTED"
 * Opponent ready -> "OPPONENT_READY"
