@@ -25,7 +25,7 @@ public class Server implements Runnable {
     final int PORT = 9999;
     final String HOST = "localhost";
     final String mail = "m.onuruysal1@gmail.com";
-    final String password = "K238LMYRqozwgR";
+    final String password = "dcbdggdagnhersvz";
 
     //// COMMANDS ////
     final String CREATE = "create";
@@ -154,26 +154,37 @@ public class Server implements Runnable {
 
         public boolean sendResetMail(String to, int newPassword) {
             Properties props = new Properties();
-            props.put("mail.smtp.host", HOST);
+            props.put("mail.debug", "true");
+            props.put("mail.smtp.host", "smtp.gmail.com");
+            props.put("mail.smtp.port", "465");
             props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.starttls.enable", "true");
 
+            props.put("mail.smtp.ssl.enable", "true");
+            props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+            props.put("mail.smtp.socketFactory.fallback", "false");
             Session session = Session.getDefaultInstance(props,
                     new javax.mail.Authenticator() {
                         protected PasswordAuthentication getPasswordAuthentication() {
                             return new PasswordAuthentication(mail, password);
                         }
                     });
+            session.setDebug(true);
             try {
                 MimeMessage message = new MimeMessage(session);
                 message.setFrom(new InternetAddress(mail));
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
                 message.setSubject("Battleships Password Reset");
                 message.setText(
-                        "Your password for the account with mail \"" + to + "\" has been changed to " + newPassword +
+                        "Password for the account with mail \"" + to + "\" has been changed to " + newPassword +
                                 ". You can change your password later in the game settings.");
 
                 // send the message
-                Transport.send(message);
+                Transport transport = session.getTransport("smtps");
+                transport.connect();
+                message.saveChanges();
+                transport.sendMessage(message, message.getAllRecipients());
+                transport.close();
 
                 System.out.println("message sent");
                 return true;
@@ -324,12 +335,7 @@ public class Server implements Runnable {
                 }
             } else if (result[0].equals(DISCONNECT)) {
                 connectedUsers.remove(this);
-                try {
-                    out.close();
-                    in.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
                 for (Connection c : connectedUsers) {
                     if (c.getUserID() == getOpponentID()) {
                         c.setStatus(0);
@@ -391,13 +397,7 @@ public class Server implements Runnable {
 
             } else if (result[0].equals(DELETE_ACCOUNT)) {
                 if (database.deleteAccount(getUserID())) {
-                    try {
-                        out.close();
-                        in.close();
-                    } catch (IOException e) {
 
-                        e.printStackTrace();
-                    }
                     connectedUsers.remove(this);
                     System.out.println("Deleted");
                     for (Connection c : connectedUsers) {
@@ -415,9 +415,14 @@ public class Server implements Runnable {
                 setStatus(0);
                 String onlinePlayers = "ONLINE_PLAYERS";
                 out.println(CAN_LEAVE);
+
                 for (Connection con : connectedUsers) {
                     if (getUserID() == con.getUserID()) {
                         continue;
+                    }
+                    if (getOpponentID() == con.getUserID()) {
+                        con.setStatus(0);
+                        con.setOpponentID(-1);
                     }
                     onlinePlayers += " " + con.getUserID() + " " + con.getName() + " " + con.getStatus();
                 }
@@ -521,7 +526,7 @@ public class Server implements Runnable {
                 }
             } else if (result[0].equals(RESET_PASSWORD)) {
                 int newPassword = generatePassword();
-                if (database.resetPassword(getUserID(), result[1], newPassword)) {
+                if (database.resetPassword(result[1], newPassword)) {
                     out.println(PASSWORD_RESET);
                     sendResetMail(result[1], newPassword);
                     System.out.println("hersey bitti");
@@ -530,12 +535,7 @@ public class Server implements Runnable {
                     out.println(PASSWORD_RESET_FAIL);
                     System.out.println("failed");
                 }
-                try {
-                    out.close();
-                    in.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
                 connectedUsers.remove(this);
             } else {
                 System.out.println(command);

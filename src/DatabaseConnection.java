@@ -129,10 +129,10 @@ public class DatabaseConnection {
         }
     }
 
-    public boolean resetPassword(int id, String mail, int newPassword) {
-        ResultSet set;
+    public boolean resetPassword(String mail, int newPassword) {
+        ResultSet set = null;
         try {
-            set = statement.executeQuery("SELECT userMail FROM users where userID = " + id + ";");
+            set = statement.executeQuery("SELECT * FROM users where userMail = '" + mail + "';");
             if (!set.next()) {
                 System.out.println("a");
                 return false;
@@ -141,9 +141,11 @@ public class DatabaseConnection {
             System.out.println("c");
             e.printStackTrace();
         }
+
         try {
             statement
-                    .executeUpdate("UPDATE users SET userPassword = '" + newPassword + "' WHERE userID = " + id + ";");
+                    .executeUpdate("UPDATE users SET userPassword = '" + newPassword + "' WHERE userID = "
+                            + set.getInt("userID") + ";");
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
