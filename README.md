@@ -19,6 +19,7 @@
 * Player wins -> "win [score]"
 * Player loses -> "lose [score]"
 * Player goes back to lobby -> "game_finished"
+* Did not play in time -> "skip"
 
 ## Output formats
 * Failed login or signup -> "FAIL"
@@ -45,6 +46,7 @@
 * Location guess -> "GUESS [row] [column]"
 * Correct guess -> "HIT"
 * Incorrect guess -> "MISS"
+* Opponent did not play in time -> "SKIP"
 * Dummy message in order to finish the setup thread -> ""
 
 TODO send all players player joined game

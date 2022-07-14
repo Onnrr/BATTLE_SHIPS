@@ -70,6 +70,8 @@ public class Server implements Runnable {
     final String RESET_PASSWORD = "reset_password";
     final String PASSWORD_RESET = "PASSWORD_RESET";
     final String PASSWORD_RESET_FAIL = "PASSWORD_RESET_FAIL";
+    final String TIME_UP = "skip";
+    final String SKIP = "SKIP";
 
     final String WIN = "win";
     final String LOSE = "lose";
@@ -537,6 +539,13 @@ public class Server implements Runnable {
                 }
 
                 connectedUsers.remove(this);
+            } else if (result[0].equals(TIME_UP)) {
+                for (Connection con : connectedUsers) {
+                    if (getUserID() == con.getOpponentID()) {
+                        con.sendMessage(SKIP);
+                        ;
+                    }
+                }
             } else {
                 System.out.println(command);
             }
