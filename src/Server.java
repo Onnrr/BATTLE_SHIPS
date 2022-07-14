@@ -156,15 +156,15 @@ public class Server implements Runnable {
 
         public boolean sendResetMail(String to, int newPassword) {
             Properties props = new Properties();
-            props.put("mail.debug", "true");
-            props.put("mail.smtp.host", "smtp.gmail.com");
-            props.put("mail.smtp.port", "465");
-            props.put("mail.smtp.auth", "true");
             props.put("mail.smtp.starttls.enable", "true");
 
-            props.put("mail.smtp.ssl.enable", "true");
-            props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-            props.put("mail.smtp.socketFactory.fallback", "false");
+            props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+            props.put("mail.smtp.user", mail);
+            props.put("mail.smtp.password", password);
+            props.put("mail.smtp.port", "587");
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+
             Session session = Session.getDefaultInstance(props,
                     new javax.mail.Authenticator() {
                         protected PasswordAuthentication getPasswordAuthentication() {
@@ -182,9 +182,8 @@ public class Server implements Runnable {
                                 ". You can change your password later in the game settings.");
 
                 // send the message
-                Transport transport = session.getTransport("smtps");
-                transport.connect();
-                message.saveChanges();
+                Transport transport = session.getTransport("smtp");
+                transport.connect("smtp.gmail.com", mail, password);
                 transport.sendMessage(message, message.getAllRecipients());
                 transport.close();
 
