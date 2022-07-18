@@ -23,7 +23,7 @@
 
 ## Output formats
 * Failed login or signup -> "FAIL"
-* Successful login or signup -> "SUCCES"
+* Successful login or signup -> "SUCCESS"
 * User information -> "INFO [userID] [userName] [userScore] [mail]"
 * New player connected -> "CONNECTED [userID] [userName]"
 * Player disconnected -> "DISCONNECTED [userID] [userName]"
