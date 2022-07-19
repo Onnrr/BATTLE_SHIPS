@@ -48,5 +48,3 @@
 * Incorrect guess -> "MISS"
 * Opponent did not play in time -> "SKIP"
 * Dummy message in order to finish the setup thread -> ""
-
-TODO send all players player joined game
