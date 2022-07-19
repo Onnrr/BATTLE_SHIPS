@@ -282,7 +282,6 @@ public class Server implements Runnable {
                 }
             } else if (result[0].equals(LOGIN_CHECK)) {
                 if (database.checkUser(result[1], result[2])) {
-                    System.out.println("Successful Login");
                     ResultSet set = database.getUserInfo(result[1]);
                     String userInfo = "";
 
@@ -292,6 +291,21 @@ public class Server implements Runnable {
                         String userName = set.getString("userName");
                         int score = set.getInt("userScore");
                         String mail = set.getString("userMail");
+
+                        for (Connection c : connectedUsers) {
+                            if (c.getUserID() == id) {
+                                out.println(FAIL);
+                                connectedUsers.remove(this);
+                                try {
+                                    out.close();
+                                    in.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                System.out.println("Login failed");
+                                return;
+                            }
+                        }
 
                         setUserID(id);
                         setName(userName);
